@@ -1,3 +1,4 @@
+// src/pages/Signup.jsx
 import React, { useState } from "react";
 import { auth, googleProvider, db } from "../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
@@ -8,6 +9,7 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
@@ -26,8 +28,9 @@ const Signup = () => {
         email: email,
       });
 
-      navigate("/chat"); // Redirect to chat
+      navigate("/"); // Redirect to chat
     } catch (error) {
+      setError(error.message);
       console.error(error.message);
     }
   };
@@ -37,16 +40,16 @@ const Signup = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      // Check if user already exists in Firestore, else add
-      const userRef = doc(db, "users", user.uid);
+      // Store Google account data in Firestore (merging if already exists)
       await setDoc(
-        userRef,
+        doc(db, "users", user.uid),
         { username: user.displayName, email: user.email },
         { merge: true }
       );
 
-      navigate("/chat");
+      navigate("/");
     } catch (error) {
+      setError(error.message);
       console.error(error.message);
     }
   };
@@ -54,6 +57,7 @@ const Signup = () => {
   return (
     <div className="signup">
       <h2>Sign Up</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <form onSubmit={handleSignup}>
         <input
           type="text"

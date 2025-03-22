@@ -9,9 +9,8 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   // Login with Email/Password
   const handleEmailLogin = async (e) => {

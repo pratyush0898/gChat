@@ -1,6 +1,7 @@
+// src/pages/Chat.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, firestore } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   collection,
   addDoc,
@@ -17,17 +18,17 @@ function Chat() {
 
   // Check if user is authenticated
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!user) {
         navigate("/login"); // Redirect to login if not logged in
       }
     });
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, [navigate]);
 
-  // Fetch chat messages
+  // Fetch chat messages in real time
   useEffect(() => {
-    const q = query(collection(firestore, "chatdata"), orderBy("createdAt"));
+    const q = query(collection(db, "chatdata"), orderBy("createdAt"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setMessages(msgs);
@@ -41,7 +42,7 @@ function Chat() {
     if (!currentUser) return;
 
     try {
-      await addDoc(collection(firestore, "chatdata"), {
+      await addDoc(collection(db, "chatdata"), {
         message,
         username: currentUser.displayName || currentUser.email,
         createdAt: serverTimestamp(),

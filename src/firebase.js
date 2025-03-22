@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration (from Firebase Console)
+// Your web app's Firebase configuration (update with your actual config)
 const firebaseConfig = {
     apiKey: "AIzaSyDxjdf15YrxZWHZhJmJJONwO4IaiyRzgl4",
     authDomain: "globelchaters.firebaseapp.com",
@@ -17,9 +17,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
-const db = getFirestore(app);
+const db = getFirestore(app); // Use "db" consistently for Firestore
 const googleProvider = new GoogleAuthProvider();
 
-export { auth, firestore, db, googleProvider };
-
+export { auth, db, googleProvider };
