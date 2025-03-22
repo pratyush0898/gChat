@@ -1,68 +1,57 @@
-// src/pages/Signup.jsx
 import React, { useState } from "react";
+import { auth, googleProvider } from "../firebase";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-function Signup() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
+const Signup = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      // Update display name after signup
-      await updateProfile(userCredential.user, { displayName: formData.name });
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/chat"); // Redirect to chat after signup
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/chat"); // Redirect after Google sign-in
+    } catch (error) {
+      console.error(error.message);
     }
   };
 
   return (
-    <div>
-      <h2>Signup</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="signup">
+      <h2>Sign Up</h2>
       <form onSubmit={handleSignup}>
         <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          onChange={handleChange}
-          value={formData.name}
-        />
-        <input
           type="email"
-          name="email"
           placeholder="Email"
-          onChange={handleChange}
-          value={formData.email}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
-          name="password"
           placeholder="Password"
-          onChange={handleChange}
-          value={formData.password}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button type="submit">Signup</button>
+        <button type="submit">Sign Up</button>
       </form>
+      <button onClick={handleGoogleSignup} className="google-signin">
+        Sign up with Google
+      </button>
     </div>
   );
-}
+};
 
 export default Signup;
